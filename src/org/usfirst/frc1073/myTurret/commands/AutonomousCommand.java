@@ -1,6 +1,5 @@
 package org.usfirst.frc1073.myTurret.commands;
 
-
 import edu.wpi.first.wpilibj.command.Command;
 import org.usfirst.frc1073.myTurret.Robot;
 import org.usfirst.frc1073.myTurret.RobotMap;
