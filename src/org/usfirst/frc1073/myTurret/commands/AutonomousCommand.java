@@ -47,16 +47,16 @@ public class AutonomousCommand extends Command {
 		blockCount = netTable.getNumber("Blocks", 0);
 
 	// Defines Speed and slow down markers
-		double rotationalSpeed = .2;
+		double rotationalSpeed = 0.2;
 		double verticalSpeed = 0.1;
 		double rotationalEndSpeed = 0;
 		double verticalEndSpeed = 0;
-		double side = 8;
+		double side = 8; // Marks the reasonable area around the center
 
 	// BLockCount asks the Pixy how many things it sees
 	// When it sees something, we track it
 		if (blockCount > 0) {
-			SmartDashboard.putString("Current State", "Targeting");
+			SmartDashboard.putString("Current State", "Targeting (" + blockCount + ")");
 			
 	// Increases speed of the turrets rotation depending on 
 	// how far the target is to the left or right
@@ -97,6 +97,12 @@ public class AutonomousCommand extends Command {
 	// This code sends the info to the panny
 	// as long as it isn't hitting a limit switch.
 			if (RobotMap.leftLimit.get() == false && RobotMap.rightLimit.get() == false) {
+				RobotMap.panny.set(rotationalEndSpeed);
+			}
+			else if (RobotMap.leftLimit.get() == true && xDelta > 0) {
+				RobotMap.panny.set(rotationalEndSpeed);
+			}
+			else if (RobotMap.rightLimit.get() == true && xDelta < 0) {
 				RobotMap.panny.set(rotationalEndSpeed);
 			}
 			else {
@@ -144,6 +150,12 @@ public class AutonomousCommand extends Command {
 			if (RobotMap.lowerLimit.get() == false && RobotMap.upperLimit.get() == false) {
 				RobotMap.tilty.set(verticalEndSpeed);
 			}
+			else if (RobotMap.lowerLimit.get() == true && yDelta > 0) {
+				RobotMap.tilty.set(verticalEndSpeed);
+			}
+			else if (RobotMap.upperLimit.get() == true && yDelta < 0) {
+				RobotMap.tilty.set(verticalEndSpeed);
+			}
 			else {
 				RobotMap.tilty.set(0);
 			}
@@ -152,7 +164,7 @@ public class AutonomousCommand extends Command {
 	// When no blocks are seen, we strafe back and forth, and up and down,
 	// while the turret looks for the target.
 		else {
-			SmartDashboard.putString("Current State", "Searching");
+			SmartDashboard.putString("Current State", "Searching (" + blockCount + ")");
 			
 			// Left and right
 			if (RobotMap.leftLimit.get() == true) {
