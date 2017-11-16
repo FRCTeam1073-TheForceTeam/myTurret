@@ -85,7 +85,7 @@ public class Battle extends DealingDamage {
 		}
 		if (OwnTotalDamageTaken >= OwnHealth){
 			System.out.println("Sorry Bud, but you were just unlucky.");
-			System.out.println("Your opponenet is the winner of this confrentation.");
+			System.out.println("Your opponenet is the winner of this confrentation. Let's Party.");
 		}
 		else {
 			System.out.println("Wow you're really good.");
