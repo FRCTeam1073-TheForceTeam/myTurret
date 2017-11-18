@@ -45,13 +45,20 @@ public class AutonomousCommand extends Command {
 		yDelta =  netTable.getNumber("centerDistY", 0);
 		yWidth =  netTable.getNumber("AverageHeight", 0);
 		blockCount = netTable.getNumber("Blocks", 0);
-
-	// Defines Speed and slow down markers
+	
+	// Defines speed and slow down markers
 		double rotationalSpeed = 0.2;
 		double verticalSpeed = 0.1;
-		double rotationalEndSpeed = 0;
+		double horizontalEndSpeed = 0;
 		double verticalEndSpeed = 0;
-		double side = 8; // Marks the reasonable area around the center
+		double side = 8; // Marks the reasonable area around the center	
+		
+	// Puts variables from Network Tables on SmartDashboard
+		SmartDashboard.putNumber("xDelta", xDelta);
+		SmartDashboard.putNumber("xWidth", xWidth);
+		SmartDashboard.putNumber("yDelta", yDelta);
+		SmartDashboard.putNumber("yWidth", yWidth);
+		SmartDashboard.putNumber("Block Count", blockCount);
 
 	// BLockCount asks the Pixy how many things it sees
 	// When it sees something, we track it
@@ -63,47 +70,47 @@ public class AutonomousCommand extends Command {
 			if (Math.abs(xDelta) > side) {
 				if (Math.abs(xDelta) > side + 5) {
 					// Second fastest
-					rotationalEndSpeed = 2 * rotationalSpeed;
+					horizontalEndSpeed = 2 * rotationalSpeed;
 				}
 				if (Math.abs(xDelta) > side + 15){
 					// Fastest speed
-					rotationalEndSpeed = 3 * rotationalSpeed;
+					horizontalEndSpeed = 3 * rotationalSpeed;
 				}
 				else {
 					// Third fastest
-					rotationalEndSpeed = rotationalSpeed;
+					horizontalEndSpeed = rotationalSpeed;
 				}
 			}
 			else {
 				// Nothing changes
-				rotationalEndSpeed = 0;
+				horizontalEndSpeed = 0;
 			}
 			
 	// This code handles the left and right motion of the turret
 	// based on the Pixy's values
 			if (xDelta > side) {
-				rotationalEndSpeed = rotationalEndSpeed;
+				horizontalEndSpeed = horizontalEndSpeed;
 				SmartDashboard.putString("Target", "Right");
 			}
 			else if (xDelta < -side) {
-				rotationalEndSpeed = -rotationalEndSpeed;
+				horizontalEndSpeed = -horizontalEndSpeed;
 				SmartDashboard.putString("Target", "Left");
 			}
 			else {
-				rotationalEndSpeed = 0;
+				horizontalEndSpeed = 0;
 				SmartDashboard.putString("Target", "Centered");
 			}
 			
 	// This code sends the info to the panny
 	// as long as it isn't hitting a limit switch.
 			if (RobotMap.leftLimit.get() == false && RobotMap.rightLimit.get() == false) {
-				RobotMap.panny.set(rotationalEndSpeed);
+				RobotMap.panny.set(horizontalEndSpeed);
 			}
 			else if (RobotMap.leftLimit.get() == true && xDelta > 0) {
-				RobotMap.panny.set(rotationalEndSpeed);
+				RobotMap.panny.set(horizontalEndSpeed);
 			}
 			else if (RobotMap.rightLimit.get() == true && xDelta < 0) {
-				RobotMap.panny.set(rotationalEndSpeed);
+				RobotMap.panny.set(horizontalEndSpeed);
 			}
 			else {
 				RobotMap.panny.set(0);
@@ -191,6 +198,10 @@ public class AutonomousCommand extends Command {
 				RobotMap.tilty.set(vScanDir * .1);
 			}
 		}
+	
+	// Puts the speeds of the motors on SmartDashboard
+		SmartDashboard.putNumber("Vertical Speed", verticalEndSpeed);
+		SmartDashboard.putNumber("Horizontal Speed", horizontalEndSpeed);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
