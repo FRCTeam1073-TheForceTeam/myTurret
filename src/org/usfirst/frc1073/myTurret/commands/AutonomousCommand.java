@@ -60,6 +60,36 @@ public class AutonomousCommand extends Command {
 		SmartDashboard.putNumber("yWidth", yWidth);
 		SmartDashboard.putNumber("Block Count", blockCount);
 
+	// Limit "switches"
+		// Left limit
+        if (RobotMap.panny.get() < RobotMap.low){
+        	RobotMap.leftLimit = true;
+        }
+        else {
+        	RobotMap.leftLimit = false;
+        }
+        // Right limit
+        if (RobotMap.panny.get() > RobotMap.high){
+        	RobotMap.rightLimit = true;
+        }
+        else {
+        	RobotMap.rightLimit = false;
+        }
+        // Lower limit
+        if (RobotMap.tilty.get() < RobotMap.low){
+        	RobotMap.lowerLimit = true;
+        }
+        else {
+        	RobotMap.lowerLimit = false;
+        }
+        // Upper limit
+        if (RobotMap.tilty.get() > RobotMap.high){
+        	RobotMap.upperLimit = true;
+        }
+        else {
+        	RobotMap.upperLimit = false;
+        }
+		
 	// BLockCount asks the Pixy how many things it sees
 	// When it sees something, we track it
 		if (blockCount > 0) {
@@ -103,13 +133,13 @@ public class AutonomousCommand extends Command {
 			
 	// This code sends the info to the panny
 	// as long as it isn't hitting a limit switch.
-			if (RobotMap.leftLimit.get() == false && RobotMap.rightLimit.get() == false) {
+			if (RobotMap.leftLimit == false && RobotMap.rightLimit == false) {
 				RobotMap.panny.set(horizontalEndSpeed);
 			}
-			else if (RobotMap.leftLimit.get() == true && xDelta > 0) {
+			else if (RobotMap.leftLimit == true && xDelta > 0) {
 				RobotMap.panny.set(horizontalEndSpeed);
 			}
-			else if (RobotMap.rightLimit.get() == true && xDelta < 0) {
+			else if (RobotMap.rightLimit == true && xDelta < 0) {
 				RobotMap.panny.set(horizontalEndSpeed);
 			}
 			else {
@@ -154,13 +184,13 @@ public class AutonomousCommand extends Command {
 			
 	// This code sends the info to the tilty
 	// as long as it isn't hitting a limit switch.
-			if (RobotMap.lowerLimit.get() == false && RobotMap.upperLimit.get() == false) {
+			if (RobotMap.lowerLimit == false && RobotMap.upperLimit == false) {
 				RobotMap.tilty.set(verticalEndSpeed);
 			}
-			else if (RobotMap.lowerLimit.get() == true && yDelta > 0) {
+			else if (RobotMap.lowerLimit == true && yDelta > 0) {
 				RobotMap.tilty.set(verticalEndSpeed);
 			}
-			else if (RobotMap.upperLimit.get() == true && yDelta < 0) {
+			else if (RobotMap.upperLimit == true && yDelta < 0) {
 				RobotMap.tilty.set(verticalEndSpeed);
 			}
 			else {
@@ -174,11 +204,11 @@ public class AutonomousCommand extends Command {
 			SmartDashboard.putString("Current State", "Searching (" + blockCount + ")");
 			
 			// Left and right
-			if (RobotMap.leftLimit.get() == true) {
+			if (RobotMap.leftLimit == true) {
 				RobotMap.panny.set(.2);
 				hScanDir = 1;
 			}
-			else if (RobotMap.rightLimit.get() == true) {
+			else if (RobotMap.rightLimit == true) {
 				RobotMap.panny.set(-.2);
 				hScanDir = -1;
 			}
@@ -186,11 +216,11 @@ public class AutonomousCommand extends Command {
 				RobotMap.panny.set(hScanDir * .2);
 			}
 			// Up and down
-			if (RobotMap.upperLimit.get() == true) {
+			if (RobotMap.upperLimit == true) {
 				RobotMap.tilty.set(-.1);
 				vScanDir = -1;
 			}
-			else if (RobotMap.lowerLimit.get() == true) {
+			else if (RobotMap.lowerLimit == true) {
 				RobotMap.tilty.set(.1);
 				vScanDir = 1;
 			}
