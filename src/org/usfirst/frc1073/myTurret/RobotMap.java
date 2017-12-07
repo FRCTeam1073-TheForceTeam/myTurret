@@ -26,8 +26,8 @@ public class RobotMap {
     public static void init() {
     	
     	// Servo limit value initialization
-    	low = .1;
-    	high = .9;
+    	low = .65;
+    	high = 2.45;
     	
     	Servo panny = new Servo(0);
         LiveWindow.addActuator("DriveTrain", "panny", panny);

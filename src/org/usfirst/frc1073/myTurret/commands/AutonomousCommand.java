@@ -60,7 +60,9 @@ public class AutonomousCommand extends Command {
 		SmartDashboard.putNumber("yWidth", yWidth);
 		SmartDashboard.putNumber("Block Count", blockCount);
 
-	// Limit "switches"
+	// This instantiates "Limit switch" booleans that act on voltage coming from the servos
+	// to locate where each servo is facing. Thus using the limits of these servos and the corresponding
+	// voltages associated with them we can set limits so that the robot doesn't damage itself
 		// Left limit
         if (RobotMap.panny.get() < RobotMap.low){
         	RobotMap.leftLimit = true;
@@ -91,7 +93,7 @@ public class AutonomousCommand extends Command {
         }
 		
 	// BLockCount asks the Pixy how many things it sees
-	// When it sees something, we track it
+	// when it sees something, we track it
 		if (blockCount > 0) {
 			SmartDashboard.putString("Current State", "Targeting (" + blockCount + ")");
 			
