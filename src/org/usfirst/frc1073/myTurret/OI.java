@@ -11,8 +11,8 @@
 
 package org.usfirst.frc1073.myTurret;
 
-import org.usfirst.frc1073.myTurret.commands.*;
-import org.usfirst.frc1073.myTurret.XboxController;
+import org.usfirst.frc1073.myTurret.*;
+import org.usfirst.frc1073.myTurret.commands.AutonomousCommand;
 
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;

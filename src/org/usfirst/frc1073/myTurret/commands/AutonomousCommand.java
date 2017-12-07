@@ -1,9 +1,8 @@
 package org.usfirst.frc1073.myTurret.commands;
 
+import org.usfirst.frc1073.myTurret.*;
+
 import edu.wpi.first.wpilibj.command.Command;
-import org.usfirst.frc1073.myTurret.Robot;
-import org.usfirst.frc1073.myTurret.RobotMap;
-import org.usfirst.frc1073.myTurret.OI;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -24,17 +23,22 @@ public class AutonomousCommand extends Command {
 	double yWidth;
 	double blockCount;
 	
-	int hScanDir;
-	int vScanDir;
-
+	double horizontalPos;
+	double verticalPos;
+	
+	double horizontalDir;
+	double verticalDir;
+	
 	public AutonomousCommand() {
 		netTable = NetworkTable.getTable("TurretTable");
 	}
 
 	// Called just before this Command runs the first time
 	protected void initialize() {
-		hScanDir = -1;
-		vScanDir = 1;
+		horizontalPos = .5;
+		verticalPos = .05;
+		
+		
 	}
 
 	// Called repeatedly when this Command is scheduled to run
@@ -47,10 +51,10 @@ public class AutonomousCommand extends Command {
 		blockCount = netTable.getNumber("Blocks", 0);
 	
 	// Defines speed and slow down markers
-		double rotationalSpeed = 0.2;
-		double verticalSpeed = 0.1;
-		double horizontalEndSpeed = 0;
-		double verticalEndSpeed = 0;
+		double horizontalIncrement = 0.02;
+		double verticalIncrement = 0.01;
+		double horizontalEndMove = 0;
+		double verticalEndMove = 0;
 		double side = 8; // Marks the reasonable area around the center	
 		
 	// Puts variables from Network Tables on SmartDashboard
@@ -59,33 +63,39 @@ public class AutonomousCommand extends Command {
 		SmartDashboard.putNumber("yDelta", yDelta);
 		SmartDashboard.putNumber("yWidth", yWidth);
 		SmartDashboard.putNumber("Block Count", blockCount);
-
+		
+		double pannyGet = RobotMap.pannyA.getVoltage();
+		double tiltyGet = RobotMap.tiltyA.getVoltage();
+		
+		SmartDashboard.putNumber("panny", pannyGet);
+		SmartDashboard.putNumber("tilty", tiltyGet);
+	
 	// This instantiates "Limit switch" booleans that act on voltage coming from the servos
 	// to locate where each servo is facing. Thus using the limits of these servos and the corresponding
 	// voltages associated with them we can set limits so that the robot doesn't damage itself
 		// Left limit
-        if (RobotMap.panny.get() < RobotMap.low){
+        if (RobotMap.panny.get() < RobotMap.lowP){
         	RobotMap.leftLimit = true;
         }
         else {
         	RobotMap.leftLimit = false;
         }
         // Right limit
-        if (RobotMap.panny.get() > RobotMap.high){
+        if (RobotMap.panny.get() > RobotMap.highP){
         	RobotMap.rightLimit = true;
         }
         else {
         	RobotMap.rightLimit = false;
         }
         // Lower limit
-        if (RobotMap.tilty.get() < RobotMap.low){
+        if (RobotMap.tilty.get() < RobotMap.lowT){
         	RobotMap.lowerLimit = true;
         }
         else {
         	RobotMap.lowerLimit = false;
         }
         // Upper limit
-        if (RobotMap.tilty.get() > RobotMap.high){
+        if (RobotMap.tilty.get() > RobotMap.highT){
         	RobotMap.upperLimit = true;
         }
         else {
@@ -99,141 +109,139 @@ public class AutonomousCommand extends Command {
 			
 	// Increases speed of the turrets rotation depending on 
 	// how far the target is to the left or right
+	// by increasing the size of the increment
 			if (Math.abs(xDelta) > side) {
 				if (Math.abs(xDelta) > side + 5) {
 					// Second fastest
-					horizontalEndSpeed = 2 * rotationalSpeed;
+					horizontalEndMove = (2 * horizontalIncrement);
 				}
 				if (Math.abs(xDelta) > side + 15){
 					// Fastest speed
-					horizontalEndSpeed = 3 * rotationalSpeed;
+					horizontalEndMove = (3 * horizontalIncrement);
 				}
 				else {
 					// Third fastest
-					horizontalEndSpeed = rotationalSpeed;
+					horizontalEndMove = (1 * horizontalIncrement);
 				}
 			}
 			else {
 				// Nothing changes
-				horizontalEndSpeed = 0;
+				horizontalEndMove = 0;
 			}
 			
 	// This code handles the left and right motion of the turret
 	// based on the Pixy's values
 			if (xDelta > side) {
-				horizontalEndSpeed = horizontalEndSpeed;
+				horizontalEndMove = horizontalPos - horizontalEndMove;
 				SmartDashboard.putString("Target", "Right");
 			}
 			else if (xDelta < -side) {
-				horizontalEndSpeed = -horizontalEndSpeed;
+				horizontalEndMove = horizontalPos + horizontalEndMove;
 				SmartDashboard.putString("Target", "Left");
 			}
 			else {
-				horizontalEndSpeed = 0;
+				horizontalEndMove = horizontalPos;
 				SmartDashboard.putString("Target", "Centered");
 			}
 			
 	// This code sends the info to the panny
 	// as long as it isn't hitting a limit switch.
 			if (RobotMap.leftLimit == false && RobotMap.rightLimit == false) {
-				RobotMap.panny.set(horizontalEndSpeed);
+				RobotMap.panny.set(horizontalEndMove);
 			}
 			else if (RobotMap.leftLimit == true && xDelta > 0) {
-				RobotMap.panny.set(horizontalEndSpeed);
+				RobotMap.panny.set(horizontalEndMove);
 			}
 			else if (RobotMap.rightLimit == true && xDelta < 0) {
-				RobotMap.panny.set(horizontalEndSpeed);
+				RobotMap.panny.set(horizontalEndMove);
 			}
 			else {
-				RobotMap.panny.set(0);
+				RobotMap.panny.set(verticalPos);
 			}
 			
 	// Increases speed of the turrets vertical rotation depending on 
-	// how far the target is to the left or right
+	// how far the target is up or down by
+	// increasing the size of the increment
 			if (Math.abs(yDelta) > side) {
 				if (Math.abs(yDelta) > side + 5) {
 					// Second fastest
-					verticalEndSpeed = 2 * verticalSpeed;
+					verticalEndMove = (2 * verticalIncrement);
 				}
 				if (Math.abs(yDelta) > side + 15){
 					// Fastest speed
-					verticalEndSpeed = 3 * verticalSpeed;
+					verticalEndMove = (3 * verticalIncrement);
 				}
 				else {
 					// Third fastest
-					verticalEndSpeed = verticalSpeed;
+					verticalEndMove = (1 * verticalIncrement);
 				}
 			}
 			else {
 				// Nothing changes
-				verticalEndSpeed = 0;
+				verticalEndMove = 0;
 			}
 			
 	// This code handles the up and down motion of the turret
 	// based on the Pixy's values
 			if (yDelta > side) {
-				verticalEndSpeed = verticalEndSpeed;
-				SmartDashboard.putString("TargetVert", "Up");
-			}
-			else if (yDelta < -side) {
-				verticalEndSpeed = -verticalEndSpeed;
+				verticalEndMove = verticalPos - verticalEndMove;
 				SmartDashboard.putString("TargetVert", "Down");
 			}
+			else if (yDelta < -side) {
+				verticalEndMove = verticalPos + verticalEndMove;
+				SmartDashboard.putString("TargetVert", "Up");
+			}
 			else {
-				verticalEndSpeed = 0;
+				verticalEndMove = verticalPos;
 				SmartDashboard.putString("TargetVert", "Centered");
 			}
 			
 	// This code sends the info to the tilty
-	// as long as it isn't hitting a limit switch.
+	// as long as it isn't hitting a limit switch
 			if (RobotMap.lowerLimit == false && RobotMap.upperLimit == false) {
-				RobotMap.tilty.set(verticalEndSpeed);
+				RobotMap.tilty.set(verticalEndMove);
 			}
 			else if (RobotMap.lowerLimit == true && yDelta > 0) {
-				RobotMap.tilty.set(verticalEndSpeed);
+				RobotMap.tilty.set(verticalEndMove);
 			}
 			else if (RobotMap.upperLimit == true && yDelta < 0) {
-				RobotMap.tilty.set(verticalEndSpeed);
+				RobotMap.tilty.set(verticalEndMove);
 			}
 			else {
-				RobotMap.tilty.set(0);
+				RobotMap.tilty.set(verticalPos);
 			}
 		}
 		
 	// When no blocks are seen, we strafe back and forth, and up and down,
-	// while the turret looks for the target.
+	// while the turret looks for the target
 		else {
 			SmartDashboard.putString("Current State", "Searching (" + blockCount + ")");
 			
 			// Left and right
 			if (RobotMap.leftLimit == true) {
-				RobotMap.panny.set(.2);
-				hScanDir = 1;
+				RobotMap.panny.set(1);
 			}
 			else if (RobotMap.rightLimit == true) {
-				RobotMap.panny.set(-.2);
-				hScanDir = -1;
+				RobotMap.panny.set(0);
 			}
 			else {
-				RobotMap.panny.set(hScanDir * .2);
+				RobotMap.panny.set(0);
 			}
 			// Up and down
 			if (RobotMap.upperLimit == true) {
-				RobotMap.tilty.set(-.1);
-				vScanDir = -1;
+				RobotMap.tilty.set(0);
 			}
 			else if (RobotMap.lowerLimit == true) {
-				RobotMap.tilty.set(.1);
-				vScanDir = 1;
+				RobotMap.tilty.set(1);
 			}
 			else {
-				RobotMap.tilty.set(vScanDir * .1);
+				RobotMap.tilty.set(1);
 			}
 		}
 	
 	// Puts the speeds of the motors on SmartDashboard
-		SmartDashboard.putNumber("Vertical Speed", verticalEndSpeed);
-		SmartDashboard.putNumber("Horizontal Speed", horizontalEndSpeed);
+		SmartDashboard.putNumber("Vertical Speed", verticalEndMove);
+		SmartDashboard.putNumber("Horizontal Speed", horizontalEndMove);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
@@ -243,14 +251,15 @@ public class AutonomousCommand extends Command {
 
 	// Called once after isFinished returns true
 	protected void end() {
-		RobotMap.panny.set(0);
-		RobotMap.tilty.set(0);
+		RobotMap.panny.set(.5);
+		RobotMap.tilty.set(.5);
 	}
 
 	// Called when another command which requires one or more of the same
 	// subsystems is scheduled to run
 	protected void interrupted() {
-		RobotMap.panny.set(0);
-		RobotMap.tilty.set(0);
+		RobotMap.panny.set(.5);
+		RobotMap.tilty.set(.5);
+		
 	}
 }

@@ -15,7 +15,9 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import org.usfirst.frc1073.myTurret.commands.*;
+
+import org.usfirst.frc1073.myTurret.*;
+import org.usfirst.frc1073.myTurret.commands.AutonomousCommand;
 
 /**
  * The VM is configured to automatically run this class, and to call the
