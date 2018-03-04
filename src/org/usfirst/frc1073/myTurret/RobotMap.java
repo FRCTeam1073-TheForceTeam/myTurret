@@ -2,6 +2,7 @@ package org.usfirst.frc1073.myTurret;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
@@ -19,6 +20,8 @@ public class RobotMap {
     public static AnalogInput pannyA;
     public static AnalogInput tiltyA;
     
+    public static DigitalOutput greenLed;
+    
     public static boolean leftLimit; // Impromptu "limit switches" based off of the angle of the servos
     public static boolean rightLimit; 
     public static boolean lowerLimit;
@@ -32,11 +35,13 @@ public class RobotMap {
     public static void init() {
     	
     	// Servo limit value initialization
-    	lowP = 0;
-    	highP = 10;
+    	lowP = .05;
+    	highP = .95;
     	
-    	lowT = 0;
-    	highT = 10;
+    	lowT = .05;
+    	highT = .95;
+    	
+    	greenLed = new DigitalOutput(6);
     	
     	panny = new Servo(0);
         LiveWindow.addActuator("DriveTrain", "panny", panny);
